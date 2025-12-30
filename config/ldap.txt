@@ -1,0 +1,27 @@
+Cum îl folosești în login.php
+Rămâne aproape identic, dar asigură-te că activezi extensia ldap în noul PHP 8.2 din XAMPP.
+
+Pas critic de configurare XAMPP (PHP 8.2):
+
+Deschide D:\xampp\php\php.ini (sau din panoul de control -> Config -> PHP.ini).
+
+Caută linia ;extension=ldap (în PHP 8+ nu se mai numește php_ldap.dll, ci doar ldap).
+
+Șterge ; din față pentru a o activa:
+
+Ini, TOML
+
+extension=ldap
+
+Important: S-ar putea să ai nevoie să copiezi fișierul 
+libsasl.dll din folderul xampp\php în folderul xampp\apache\bin 
+dacă Apache nu pornește după activarea LDAP. 
+(Este un bug comun în XAMPP pe Windows).
+
+
+Ce trebuie să faci tu acum:
+Crează folderul includes (dacă nu există deja).
+
+Crează fișierul includes/ldap_auth.php cu primul cod de mai sus.
+
+Editează linia $ad_ip din ldap_auth.php cu IP-ul real al serverului tău.

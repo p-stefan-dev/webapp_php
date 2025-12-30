@@ -1,0 +1,149 @@
+/* Stiluri pentru Dashboard - "Prestige" Design V2 */
+:root {
+    --prestige-dark-indigo: #1a1a2e;
+    --prestige-dark-blue: #16213e;
+    --prestige-navy-panel: #0f3460;
+    --prestige-accent: #e94560;
+}
+html, body {
+    height: 100%;
+}
+body {
+    background-color: var(--prestige-dark-blue);
+    color: #e0e0e0;
+}
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+#sidebar-wrapper {
+    min-width: 260px;
+    max-width: 260px;
+    background-color: var(--prestige-dark-indigo);
+    transition: margin .25s ease-out;
+}
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: -260px;
+}
+.sidebar-heading {
+    padding: 1.25rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    border-bottom: 1px solid var(--prestige-dark-blue);
+}
+.sidebar-heading .fa-bolt {
+    color: var(--prestige-accent);
+}
+.sidebar-nav .list-group-item {
+    background-color: transparent;
+    border: none;
+    color: #adb5bd;
+    transition: all 0.2s ease-in-out;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid transparent;
+}
+.sidebar-nav .list-group-item .fa-fw {
+    font-size: 1rem;
+    margin-right: 0.75rem;
+}
+.sidebar-nav .list-group-item:hover {
+    background-color: var(--prestige-dark-blue);
+    color: #fff;
+}
+.sidebar-nav .list-group-item.active {
+    background-color: var(--prestige-dark-blue);
+    color: #fff;
+    font-weight: bold;
+    border-left-color: var(--prestige-accent);
+}
+#page-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Corectie pentru flexbox overflow */
+}
+.top-navbar {
+    background-color: var(--prestige-dark-indigo);
+    border-bottom: 1px solid var(--prestige-dark-blue);
+}
+.content-area {
+    flex: 1 0 auto; /* Permite continutului sa creasca si footer-ului sa ramana jos */
+    padding: 1.5rem;
+}
+.stat-card {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%), var(--prestige-navy-panel);
+    border-radius: 8px;
+    padding: 1.5rem;
+    color: white;
+    border: 1px solid var(--prestige-dark-blue);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Tranzitia pentru efectul de hover */
+}
+
+.stat-card:hover {
+    transform: translateY(-5px); /* Ridica usor cardul */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Adauga o umbra pentru profunzime */
+}
+
+.stat-title {
+    color: #adb5bd;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.stat-icon {
+    font-size: 3rem;
+    color: var(--prestige-accent);
+    opacity: 0.7;
+}
+
+/* Stiluri pentru Tabel - Design Nou */
+.table-prestige {
+    color: #e0e0e0;
+}
+.table-prestige thead th {
+    border-bottom: 2px solid var(--prestige-accent);
+    color: #fff;
+    border-top: none;
+}
+.table-prestige tbody tr {
+    border-bottom: 1px solid var(--prestige-dark-blue);
+}
+.table-prestige tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+.table-prestige.table-hover > tbody > tr:hover > * {
+    --bs-table-accent-bg: var(--prestige-navy-panel);
+    color: #fff;
+}
+
+/* Card pentru continut general, acum transparent */
+.content-card {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* Stiluri pentru Dropdown Utilizator */
+.dropdown-menu {
+    background-color: var(--prestige-dark-indigo);
+    border: 1px solid var(--prestige-dark-blue);
+}
+.dropdown-item {
+    color: #adb5bd;
+}
+.dropdown-item:hover {
+    background-color: var(--prestige-navy-panel);
+    color: #fff;
+}
+.dropdown-divider {
+    border-top-color: var(--prestige-dark-blue);
+}

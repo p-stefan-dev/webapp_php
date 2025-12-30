@@ -1,0 +1,22 @@
+/* Stiluri pentru pagina de login inspirata de Volt */
+
+.login-container {
+    min-height: 100vh;
+}
+
+.login-bg {
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+}
+
+.login-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
