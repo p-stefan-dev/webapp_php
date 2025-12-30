@@ -1,0 +1,23 @@
+CREATE TABLE `interventii` (
+  `int_id` int(8) NOT NULL AUTO_INCREMENT,
+  `categorie_id` int(8) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `nr_int` text NOT NULL,
+  `autosp` text NOT NULL,
+  `nr_serv` int(11) NOT NULL,
+  `pers_amb` text NOT NULL,
+  `pers_stingere` text NOT NULL,
+  `cod` int(8) NOT NULL,
+  `data_plc` text NOT NULL,
+  `data_sos` text NOT NULL,
+  `dur` int(11) NOT NULL,
+  `min` int(11) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `activ` int(11) NOT NULL DEFAULT 1,
+  `tip_reg` int(11) NOT NULL,
+  `rcp` int(1) DEFAULT NULL,
+  `accident` int(1) DEFAULT NULL,
+  `km` int(3) NOT NULL,
+  `asistati` int(2) NOT NULL,
+  PRIMARY KEY (`int_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
