@@ -73,8 +73,8 @@ try {
                     <i class="fas fa-chevron-down small"></i>
                 </a>
                 <div class="collapse" id="managementSubmenu">
-                    <a href="personal.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'personal.php') ? 'active' : ''; ?>">Personal</a>
-                    <a href="tehnica.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'tehnica.php') ? 'active' : ''; ?>">Tehnica</a>
+                    <a href="personal/personal.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'personal.php') ? 'active' : ''; ?>">Personal</a>
+                    <a href="tehnica/tehnica.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'tehnica.php') ? 'active' : ''; ?>">Tehnica</a>
                 </div>
             </li>
 

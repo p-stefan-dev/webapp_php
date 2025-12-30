@@ -82,7 +82,7 @@ ob_end_flush();
 
 <div class="d-flex justify-content-between mb-4">
     <h1 class="h2">Editare în Masă</h1>
-    <a href="personal.php" class="btn btn-secondary">Înapoi</a>
+    <a href="personal/personal.php" class="btn btn-secondary">Înapoi</a>
 </div>
 
 <div id="globalStatus"></div>
@@ -197,7 +197,7 @@ $(document).ready(function() {
         const originalHtml = btn.html();
         btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
 
-        fetch('bulk_edit.php', {
+        fetch('personal/bulk_edit.php', {
             method: 'POST',
             body: JSON.stringify(payload)
         })

@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Redirecționare către lista de personal
             $_SESSION['success_message'] = 'Angajatul a fost adăugat cu succes!';
-            header('Location: personal.php');
+            header('Location: personal/personal.php');
             exit();
 
         } catch (PDOException $e) {
@@ -90,14 +90,14 @@ try {
 
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="h2">Adăugare Personal Nou</h1>
-    <a href="personal.php" class="btn btn-secondary">Înapoi la Listă</a>
+    <a href="personal/personal.php" class="btn btn-secondary">Înapoi la Listă</a>
 </div>
 
 <?php if (!empty($errorMessage)): ?>
     <div class="alert alert-danger mt-3"><?php echo htmlspecialchars($errorMessage); ?></div>
 <?php endif; ?>
 
-<form action="add_personal.php" method="post" class="card content-card mt-4">
+<form action="personal/add_personal.php" method="post" class="card content-card mt-4">
     <div class="card-body">
         <div class="row">
             <div class="col-md-3 mb-3">

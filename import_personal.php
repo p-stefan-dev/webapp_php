@@ -154,7 +154,7 @@ if (isset($_FILES['excelFile'])) {
         <p class="text-muted">Dacă rândul are <strong>ID</strong>, se actualizează. Dacă <strong>ID</strong> e gol, se creează angajat nou.</p>
     </div>
     <div>
-        <a href="personal.php" class="btn btn-secondary">
+        <a href="personal/personal.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Înapoi la Listă
         </a>
     </div>
@@ -179,7 +179,7 @@ if (isset($_FILES['excelFile'])) {
             </div>
         <?php endif; ?>
 
-        <form action="import_personal.php" method="post" enctype="multipart/form-data">
+        <form action="personal/import_personal.php" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="excelFile" class="form-label">Selectați fișierul Excel (.xlsx)</label>
                 <input class="form-control" type="file" id="excelFile" name="excelFile" accept=".xlsx" required>

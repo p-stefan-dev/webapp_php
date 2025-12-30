@@ -18,7 +18,7 @@ if (!$person_id) {
     exit();
 }
 
-$return_url = $_REQUEST['return_url'] ?? 'personal.php'; 
+$return_url = $_REQUEST['return_url'] ?? 'personal/personal.php'; 
 
 $successMessage = '';
 $errorMessage = '';
@@ -151,7 +151,7 @@ try {
     <div class="alert alert-danger"><?php echo htmlspecialchars($errorMessage); ?></div>
 <?php endif; ?>
 
-<form action="edit_personal.php?id=<?php echo $person_id; ?>&return_url=<?php echo htmlspecialchars($return_url); ?>" method="post" class="card content-card mt-4">
+<form action="personal/edit_personal.php?id=<?php echo $person_id; ?>&return_url=<?php echo htmlspecialchars($return_url); ?>" method="post" class="card content-card mt-4">
     <div class="card-body">
         
         <h5 class="text-primary mb-3">Informații Personale</h5>
