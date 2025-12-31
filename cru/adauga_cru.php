@@ -12,6 +12,13 @@ if (!isset($_SESSION['user_id'])) {
 // 2. Preluare date context (Structura utilizatorului)
 // Presupunem că id_struct este în sesiune.
 $id_struct_user = $_SESSION['id_struct'] ?? 0;
+// Dacă nu există în sesiune, îl preluăm din baza de date pe baza user_id
+if (!$id_struct_user && isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("SELECT id_struct FROM personal WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $id_struct_user = $stmt->fetchColumn() ?: 0;
+    $_SESSION['id_struct'] = $id_struct_user; // opțional, pentru sesiuni viitoare
+}
 $nume_structura = "Nedefinit";
 
 try {
@@ -23,11 +30,13 @@ try {
     // Preluăm lista de CODURI DE INTERVENȚIE (din tabelul `coduri_interventie` creat anterior)
     $coduri = $pdo->query("SELECT cod_id, nume FROM coduri_interventie WHERE activ = 1 ORDER BY cod_id ASC")->fetchAll();
 
-    // Preluăm lista de PERSONAL (doar din structura curentă) pentru dropdown-uri
-    $stmt = $pdo->prepare("SELECT id, CONCAT(nume, ' ', prenume) as nume_complet 
-                           FROM personal 
-                           WHERE id_struct = ? AND activ = 1 
-                           ORDER BY nume ASC");
+    // Preluăm lista de PERSONAL (doar din structura curentă) pentru dropdown-uri, cu grad (prescurt) și prescurtarea structurii
+    $stmt = $pdo->prepare("SELECT p.id, g.prescurt, p.nume, p.prenume, s.prescurt AS structura_prescurt
+                           FROM personal p
+                           LEFT JOIN grade g ON p.id_grad = g.id_grad
+                           LEFT JOIN structuri s ON p.id_struct = s.id_struct
+                           WHERE p.id_struct = ? AND p.activ = 1
+                           ORDER BY p.nume ASC");
     $stmt->execute([$id_struct_user]);
     $personal_list = $stmt->fetchAll();
 
@@ -104,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pers_stg_str = !empty($pers_stg_arr) ? implode(',', $pers_stg_arr) : '';
 
             $sql = "INSERT INTO cru (
-                        categorie_id, user_id, nr_int, autosp, nr_serv, 
+                        id_struct, user_id, nr_int, autosp, nr_serv, 
                         pers_amb, pers_stingere, cod, 
                         data_plc, data_sos, dur, min, 
                         tip_reg, accident, rcp, asistati, km, 
@@ -151,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <link href="../assets/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="../assets/css/select2-bootstrap-5-theme.min.css" />
+<link href="../assets/css/select2-bootstrap-5-theme.min.css" rel="stylesheet"  />
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -173,11 +182,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 <?php endif; ?>
 
+
 <?php if ($successMessage): ?>
     <div class="alert alert-success alert-dismissible fade show">
         <i class="fas fa-check-circle me-2"></i><?php echo $successMessage; ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+    <script>
+        setTimeout(function() {
+            window.location.reload();
+        }, 5000);
+    </script>
 <?php endif; ?>
 
 <form action="" method="POST" id="cruForm">
@@ -317,8 +332,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="pers_amb" class="form-label fw-bold text-success">Personal SMURD / Ambulanță</label>
                         <select class="form-select select2-personal" name="pers_amb[]" id="pers_amb" multiple>
                             <?php foreach($personal_list as $pers): ?>
+                                <?php
+                                    $grad = htmlspecialchars($pers['prescurt'] ?? '-');
+                                    $nume = htmlspecialchars($pers['nume']);
+                                    $prenume = htmlspecialchars($pers['prenume']);
+                                    $struct = htmlspecialchars($pers['structura_prescurt'] ?? '');
+                                ?>
                                 <option value="<?php echo $pers['id']; ?>" <?php echo (in_array($pers['id'], $_POST['pers_amb']??[])) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($pers['nume_complet']); ?>
+                                    <?php echo $grad . ' ' . $nume . ' ' . $prenume; ?>
+                                    <?php if ($struct): ?><span class="fw-bold"> [<?php echo $struct; ?>]</span><?php endif; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -330,8 +352,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="pers_stingere" class="form-label fw-bold text-danger">Personal STINGERE</label>
                         <select class="form-select select2-personal" name="pers_stingere[]" id="pers_stingere" multiple>
                             <?php foreach($personal_list as $pers): ?>
+                                <?php
+                                    $grad = htmlspecialchars($pers['prescurt'] ?? '-');
+                                    $nume = htmlspecialchars($pers['nume']);
+                                    $prenume = htmlspecialchars($pers['prenume']);
+                                    $struct = htmlspecialchars($pers['structura_prescurt'] ?? '');
+                                ?>
                                 <option value="<?php echo $pers['id']; ?>" <?php echo (in_array($pers['id'], $_POST['pers_stingere']??[])) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($pers['nume_complet']); ?>
+                                    <?php echo $grad . ' ' . $nume . ' ' . $prenume; ?>
+                                    <?php if ($struct): ?><span class="fw-bold"> [<?php echo $struct; ?>]</span><?php endif; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -350,10 +379,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </form>
 
+
+<?php
+// --- TABEL ULTIMELE 10 RAPOARTE CRU PENTRU STRUCTURA CURENTĂ ---
+try {
+    // 1. Verificăm ce nume au coloanele în baza ta de date.
+    // Conform discuțiilor anterioare: PK este 'int_id', iar structura este 'categorie_id'.
+    
+    $stmt = $pdo->prepare("SELECT 
+            c.int_id,       /* CORECTAT: era c.id */
+            c.nr_int, 
+            c.autosp, 
+            c.nr_serv, 
+            c.cod, 
+            c.data_plc, 
+            c.data_sos, 
+            c.tip_reg, 
+            c.date, 
+            ci.nume as cod_nume
+        FROM cru c
+        LEFT JOIN coduri_interventie ci ON c.cod = ci.cod_id
+        WHERE c.id_struct = ? /* CORECTAT: era c.id_struct */
+        ORDER BY c.int_id DESC   /* CORECTAT: ordonam dupa ID */
+        LIMIT 10");
+        
+    $stmt->execute([$id_struct_user]);
+    $ultimele_cru = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    // Afișăm eroarea doar pentru tine (admin) ca să vedem ce nu merge
+    echo '<div class="alert alert-warning">Eroare SQL Istoric: ' . $e->getMessage() . '</div>';
+    $ultimele_cru = [];
+}
+?>
+
+<div class="card mt-5">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-history me-2"></i>Ultimele 10 rapoarte CRU adăugate pentru structura ta</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Număr Intervenție</th>
+                        <th>Autospecială</th>
+                        <th>Servanți</th>
+                        <th>Cod</th>
+                        <th>Plecare</th>
+                        <th>Sosire</th>
+                        <th>Tip</th>
+                        <th>Data Adăugare</th>
+                        <th>Editare</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if (empty($ultimele_cru)): ?>
+                    <tr><td colspan="9" class="text-center">Nu există rapoarte recente pentru structura ta.</td></tr>
+                <?php else: ?>
+                    <?php foreach ($ultimele_cru as $idx => $rap): ?>
+                        <tr>
+                            <td><?php echo $idx+1; ?></td>
+                            <td><?php echo htmlspecialchars($rap['nr_int']); ?></td>
+                            <td><?php echo htmlspecialchars($rap['autosp']); ?></td>
+                            <td><?php echo htmlspecialchars($rap['nr_serv']); ?></td>
+                            <td><?php echo htmlspecialchars($rap['cod']) . ' - ' . htmlspecialchars($rap['cod_nume']); ?></td>
+                            <td><?php echo htmlspecialchars($rap['data_plc']); ?></td>
+                            <td><?php echo htmlspecialchars($rap['data_sos']); ?></td>
+                            <td><?php echo ($rap['tip_reg'] == 1 ? 'Stingere' : ($rap['tip_reg'] == 2 ? 'SMURD' : '-')); ?></td>
+                            <td><?php echo htmlspecialchars($rap['date']); ?></td>
+                            <td>
+                                <a href="editeaza_cru.php?id=<?php echo urlencode($rap['int_id']); ?>" class="btn btn-sm btn-primary" title="Editează raportul">
+                                    <i class="fas fa-edit"></i> Editare
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <?php require_once '../includes/dashboard_footer.php'; ?>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="../assets/js/select2.min.js"></script>
 
 <script>
 $(document).ready(function() {

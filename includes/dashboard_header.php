@@ -2,10 +2,15 @@
 // includes/dashboard_header.php - "Prestige" Design
 
 if (session_status() == PHP_SESSION_NONE) session_start();
-require_once 'auth_check.php';
-require_once __DIR__ . '/../config/db.php';
 
-// Initializare variabile default pentru a preveni erori "Undefined variable"
+// CĂI ABSOLUTE PENTRU PHP (folosind dirname(__DIR__))
+// dirname(__DIR__) = folderul 'htdocs'. Adăugăm /includes/auth_check.php
+require_once dirname(__DIR__) . '/includes/auth_check.php';
+require_once __DIR__ . '/../config/db.php';
+// Dacă nu ai definit BASE_URL în config, o definim aici temporar (nerecomandat, mai bine în config)
+if (!defined('BASE_URL')) define('BASE_URL', '/nume_proiect/'); 
+
+// Initializare variabile default
 $appName = 'WebApp Intranet';
 $userRole = 0;
 $userFullName = 'Utilizator';
@@ -20,8 +25,6 @@ try {
     }
 
     // 2. Preluam Datele Utilizatorului Curent
-    // FIX: Folosim $_SESSION['user_id'] direct, deoarece tabela users nu mai exista
-    // ID-ul din sesiune este direct ID-ul din tabela personal.
     $currentUserId = $_SESSION['user_id'] ?? 0;
 
     if ($currentUserId > 0) {
@@ -36,8 +39,7 @@ try {
     }
 
 } catch (PDOException $e) {
-    // In caz de eroare DB, ramanem cu valorile default, nu oprim executia cu die()
-    error_log("Eroare Header: " + $e->getMessage());
+    error_log("Eroare Header: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -46,23 +48,24 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) . ' - ' . htmlspecialchars($appName) : 'WebApp Intranet'; ?></title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/custom.css">
+    
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/custom.css">
 </head>
 <body>
 
 <div id="wrapper">
     <div id="sidebar-wrapper">
         <div class="sidebar-heading">
-            <a href="home.php" class="text-white text-decoration-none">
+            <a href="<?php echo BASE_URL; ?>home.php" class="text-white text-decoration-none">
                 <i class="fas fa-bolt"></i>
                 <span class="ms-2"><?php echo htmlspecialchars($appName); ?></span>
             </a>
         </div>
         <ul class="list-group list-group-flush sidebar-nav">
             <li class="nav-item">
-                <a href="home.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'active' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>home.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'home.php') ? 'active' : ''; ?>">
                     <i class="fas fa-tachometer-alt fa-fw"></i> Panou Principal
                 </a>
             </li>
@@ -73,14 +76,20 @@ try {
                     <i class="fas fa-chevron-down small"></i>
                 </a>
                 <div class="collapse" id="managementSubmenu">
-                    <a href="personal/personal.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'personal.php') ? 'active' : ''; ?>">Personal</a>
-                    <a href="tehnica/tehnica.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'tehnica.php') ? 'active' : ''; ?>">Tehnica</a>
+                    <a href="<?php echo BASE_URL; ?>personal/personal.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'personal.php') ? 'active' : ''; ?>">Personal</a>
+                    <a href="<?php echo BASE_URL; ?>tehnica/tehnica.php" class="list-group-item list-group-item-action ps-5 <?php echo (basename($_SERVER['PHP_SELF']) == 'tehnica.php') ? 'active' : ''; ?>">Tehnica</a>
                 </div>
+            </li>
+
+            <li class="nav-item">
+                <a href="<?php echo BASE_URL; ?>cru/adauga_cru.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'adauga_cru.php') ? 'active' : ''; ?>">
+                    <i class="fas fa-file-medical-alt fa-fw"></i> Rapoarte C.R.U.
+                </a>
             </li>
 
             <?php if (isset($userRole) && $userRole == 1): // Afisam doar pentru admini ?>
             <li class="nav-item">
-                 <a href="settings.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'settings.php') ? 'active' : ''; ?>">
+                 <a href="<?php echo BASE_URL; ?>settings.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'settings.php') ? 'active' : ''; ?>">
                     <i class="fas fa-cog fa-fw"></i> Setări
                 </a>
             </li>
@@ -100,14 +109,14 @@ try {
                             <span class="ms-2 d-none d-lg-inline"><?php echo htmlspecialchars($userFullName); ?></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="my_profile.php">Profil</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>my_profile.php">Profil</a>
                             
                             <?php if (isset($userRole) && $userRole == 1): ?>
-                            <a class="dropdown-item" href="settings.php">Setări Aplicație</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>settings.php">Setări Aplicație</a>
                             <?php endif; ?>
                             
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="logout.php">Deconectare</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>logout.php">Deconectare</a>
                         </div>
                     </li>
                 </ul>

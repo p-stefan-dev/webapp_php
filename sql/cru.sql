@@ -1,6 +1,6 @@
-CREATE TABLE `interventii` (
+CREATE TABLE `cru` (
   `int_id` int(8) NOT NULL AUTO_INCREMENT,
-  `categorie_id` int(8) NOT NULL,
+  `id_struct` int(8) NOT NULL,
   `user_id` int(11) NOT NULL,
   `nr_int` text NOT NULL,
   `autosp` text NOT NULL,

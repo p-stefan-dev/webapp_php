@@ -1,7 +1,9 @@
 <?php
 // personal.php
 
+
 $pageTitle = 'Management Personal';
+
 require_once '../includes/dashboard_header.php';
 
 // Protectie - doar adminii (rol=1) pot accesa aceasta pagina
@@ -127,16 +129,16 @@ function sort_link($column, $text, $current_sort, $current_order, $search_term) 
         <p class="text-muted">Total personal găsit: <strong><?php echo $total_records; ?></strong></p>
     </div>
     <div>
-        <a href="personal/add_personal.php" class="btn btn-primary">
+        <a href="add_personal.php" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Adaugă
         </a>
-        <a href="personal/bulk_edit.php" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Editare
+        <a href="bulk_edit.php" class="btn btn-primary">
+            <i class="fas fa-pencil-alt me-2"></i>Editare
         </a>
-        <a href="personal/import_personal.php" class="btn btn-success">
+        <a href="import_personal.php" class="btn btn-success">
             <i class="fas fa-file-excel me-2"></i>Import
         </a>
-        <a href="personal/export_personal.php" class="btn btn-success">
+        <a href="export_personal.php" class="btn btn-success">
             <i class="fas fa-file-excel me-2"></i>Export
         </a>
     </div>
@@ -148,7 +150,7 @@ function sort_link($column, $text, $current_sort, $current_order, $search_term) 
 
 <div class="card mb-3">
     <div class="card-body">
-        <form action="personal/personal.php" method="GET" id="searchForm" class="row g-3 align-items-center">
+        <form action="" method="GET" id="searchForm" class="row g-3 align-items-center">
             <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort_column); ?>">
             <input type="hidden" name="order" value="<?php echo htmlspecialchars($sort_order); ?>">
 
@@ -162,7 +164,7 @@ function sort_link($column, $text, $current_sort, $current_order, $search_term) 
             </div>
             <div class="col-auto">
                 <?php if(!empty($search)): ?>
-                    <a href="personal/personal.php" class="btn btn-secondary">Resetează</a>
+                    <a href="personal.php" class="btn btn-secondary">Resetează</a>
                 <?php endif; ?>
                 <button type="submit" class="btn btn-primary">Caută</button>
             </div>
@@ -192,18 +194,23 @@ function sort_link($column, $text, $current_sort, $current_order, $search_term) 
                     <?php foreach ($personalList as $person): ?>
                         <tr>
                             <td>
-                                <strong><?php echo htmlspecialchars($person['nume'] . ' ' . $person['prenume']); ?></strong><br>
-                                <small class="text-muted"><?php echo htmlspecialchars($person['email']); ?></small>
-                            </td>
-                            <td><?php echo htmlspecialchars($person['nume_grad'] ?? '-'); ?></td>
-                            <td>
-                                <?php 
+                                <?php
+                                    // Grad, Nume Prenume, Structura (bold)
+                                    $grad = htmlspecialchars($person['nume_grad'] ?? '-');
+                                    $nume = htmlspecialchars($person['nume']);
+                                    $prenume = htmlspecialchars($person['prenume']);
                                     $struct = htmlspecialchars($person['structura_prescurt'] ?? '');
                                     if (!empty($person['substructura_prescurt'])) {
                                         $struct .= ' / ' . htmlspecialchars($person['substructura_prescurt']);
                                     }
-                                    echo $struct ?: '-';
                                 ?>
+                                <span><?php echo $grad; ?></span>
+                                <span class="ms-2"><?php echo $nume . ' ' . $prenume; ?></span>
+                                <?php if ($struct): ?>
+                                    <span class="fw-bold ms-2">[<?php echo $struct; ?>]</span>
+                                <?php endif; ?>
+                                <br>
+                                <small class="text-muted"><?php echo htmlspecialchars($person['email']); ?></small>
                             </td>
                             <td>
                                 <?php 
@@ -232,7 +239,7 @@ function sort_link($column, $text, $current_sort, $current_order, $search_term) 
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <a href="personal/edit_personal.php?id=<?php echo $person['id']; ?>&return_url=personal/personal.php" class="btn btn-sm btn-primary">
+                                <a href="personal/edit_personal.php?id=<?php echo $person['id']; ?>&return_url=personal.php" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             </td>

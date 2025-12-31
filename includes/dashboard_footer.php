@@ -1,18 +1,15 @@
-        </main>
+</main>
 
         <footer class="mt-auto p-3 text-center text-muted small">
             &copy; <?php echo date('Y'); ?> WebApp Intranet. Toate drepturile rezervate.
         </footer>
     </div>
-    <!-- /#page-content-wrapper -->
-</div>
-<!-- /#wrapper -->
+    </div>
+<script src="<?php echo BASE_URL; ?>assets/js/bootstrap.bundle.min.js"></script>
 
-<!-- Bootstrap JS -->
-<script src="assets/js/bootstrap.bundle.min.js"></script>
-<!-- Sidebar Toggle Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar Toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', function(e) {
@@ -22,11 +19,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Connection Checker ---
-    const checkInterval = 5000; // 5 secunde
-    let isOffline = false; // Flag pentru a urmari starea conexiunii
+    const checkInterval = 5000; 
+    let isOffline = false; 
+
+    // FIX: Definim calea absolută către fișierul de verificare
+    // Astfel, va funcționa și din /personal/, și din /tehnica/
+    const checkUrl = '<?php echo BASE_URL; ?>check_connection.php';
+    const homeUrl = '<?php echo BASE_URL; ?>index.php';
 
     function checkConnection() {
-        fetch('check_connection.php')
+        fetch(checkUrl)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok, status: ' + response.status);
@@ -38,23 +40,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Conexiunea a revenit
                     if (isOffline) {
                         console.log('Connection restored. Redirecting to home...');
-                        window.location.href = 'index.php'; // Redirectionare la pagina principala
+                        window.location.href = homeUrl; 
                     }
                     isOffline = false;
                 } else {
-                    // JSON-ul indica o eroare, dar conexiunea la server exista
+                    // JSON-ul indica o eroare
                     if (!isOffline) {
-                        console.log('Connection problem reported by server. Redirecting to status page...');
-                        window.location.href = 'status.php';
+                        console.log('Connection problem reported by server.');
+                        // Poți comenta alerta dacă e prea sâcâitoare
+                        // alert('Conexiune la server indisponibilă. Contactați administratorul!');
                     }
                     isOffline = true;
                 }
             })
             .catch(error => {
-                // Eroare de retea, serverul nu este accesibil
+                // Eroare de retea (404 Not Found intra tot aici la fetch in anumite cazuri, sau la primul then)
                 console.error('Connection check failed:', error);
                 if (!isOffline) {
-                    window.location.href = 'status.php';
+                     // Aceasta alerta aparea pentru ca nu gasea fisierul check_connection.php
+                     // Acum ar trebui sa dispara.
+                    // alert('Conexiune la server indisponibilă. Contactați administratorul!');
                 }
                 isOffline = true;
             });
@@ -63,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Verificam conexiunea la incarcarea paginii
     checkConnection();
 
-    // Si apoi setam intervalul pentru verificari periodice
+    // Si apoi setam intervalul
     setInterval(checkConnection, checkInterval);
 });
 </script>

@@ -4,6 +4,7 @@
 
 $pageTitle = 'Management Tehnică';
 require_once '../includes/dashboard_header.php';
+$id_struct_user = $_SESSION['id_struct'] ?? 0;
 
 // Protecție acces
     if (!isset($userRole) || $userRole != 1) {
