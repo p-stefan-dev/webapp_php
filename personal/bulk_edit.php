@@ -78,7 +78,7 @@ ob_end_flush();
 ?>
 
 <link href="../assets/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="../assets/css/select2-bootstrap-5-theme.min.css" />
+<link  href="../assets/css/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
 <div class="d-flex justify-content-between mb-4">
     <h1 class="h2">Editare în Masă</h1>

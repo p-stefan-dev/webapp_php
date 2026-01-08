@@ -386,93 +386,10 @@ try {
                 <button type="submit" class="btn btn-warning">Salvează Modificările</button>
             </div>
         </form>
-        <div class="row mt-5">
-    <div class="col-12">
-        <div class="card content-card">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Ultimele 10 rapoarte introduse</h5>
-                <span class="badge bg-secondary">Structura Curentă</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="text-center" style="width: 50px;">ID</th>
-                                <th>Nr. Intervenție</th>
-                                <th>Indicativ Auto</th>
-                                <th>Tip Intervenție (Cod)</th>
-                                <th class="text-center">Durată</th>
-                                <th>Operator (User)</th>
-                                <th class="text-end">Data Adăugării</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($istoric)): ?>
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        Nu există înregistrări recente pentru această structură.
-                                    </td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($istoric as $rec): ?>
-                                    <tr>
-                                        <td class="text-center text-muted">
-                                            #<?php echo htmlspecialchars($rec['int_id']); ?>
-                                        </td>
-                                        <td class="fw-bold text-primary">
-                                            <?php echo htmlspecialchars($rec['nr_int']); ?>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-light text-dark border">
-                                                <?php echo htmlspecialchars($rec['autosp']); ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                                // Afișăm numele codului sau un fallback
-                                                echo htmlspecialchars($rec['nume_interventie'] ?? 'Cod Necunoscut'); 
-                                            ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <?php echo htmlspecialchars($rec['dur']); ?> min
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-column" style="line-height: 1.2;">
-                                                <span class="fw-bold" style="font-size: 0.9rem;">
-                                                    <i class="fas fa-user-edit me-1 text-muted"></i>
-                                                    <?php echo htmlspecialchars($rec['user_nume'] . ' ' . $rec['user_prenume']); ?>
-                                                </span>
-                                                <small class="text-muted fst-italic">
-                                                    <?php 
-                                                        // Afișăm substructura dacă există, altfel "-"
-                                                        echo !empty($rec['user_substr']) 
-                                                            ? htmlspecialchars($rec['user_substr']) 
-                                                            : '<span class="text-secondary">-</span>'; 
-                                                    ?>
-                                                </small>
-                                            </div>
-                                        </td>
-                                        <td class="text-end small text-muted">
-                                            <?php 
-                                                // Formatare dată (ex: 30.12.2025 14:30)
-                                                echo date('d.m.Y H:i', strtotime($rec['data_add'])); 
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="../assets/js/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     

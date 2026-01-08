@@ -44,21 +44,66 @@ try {
 <?php endif; ?>
 
 <?php if ($person): ?>
-<div class="card content-card mt-4">
-    <div class="card-body">
+<div class="card content-card mt-4 shadow-sm">
+    <div class="card-body p-4">
         <div class="row">
             <div class="col-md-6">
-                <p><strong>Nume Complet:</strong> <?php echo htmlspecialchars($person['nume'] . ' ' . $person['prenume']); ?></p>
-                <p><strong>Email:</strong> <?php echo htmlspecialchars($person['email']); ?></p>
-                <p><strong>Telefon:</strong> <?php echo htmlspecialchars($person['telefon'] ? $person['telefon'] : 'N/A'); ?></p>
-                <p><strong>Grad:</strong> <?php echo htmlspecialchars($person['nume_grad']); ?></p>
+                <h5 class="text-primary border-bottom pb-2 mb-3">Date Generale</h5>
+                
+                <p class="mb-2"><strong>Nume Complet:</strong> 
+                    <span class="fs-5 ms-2"><?php echo htmlspecialchars($person['nume'] . ' ' . $person['prenume']); ?></span>
+                </p>
+                
+                <p class="mb-2"><strong>Email:</strong> <?php echo htmlspecialchars($person['email']); ?></p>
+                
+                <p class="mb-2"><strong>Telefon:</strong> <?php echo htmlspecialchars($person['telefon'] ? $person['telefon'] : 'N/A'); ?></p>
+                
+                <p class="mb-2"><strong>Grad:</strong> <?php echo htmlspecialchars($person['nume_grad']); ?></p>
+
+                <p class="mb-2"><strong>Rol Aplicație:</strong> 
+                    <?php 
+                        switch ($person['rol']) {
+                            case 1: 
+                                echo '<span class="badge bg-danger ms-1">Administrator</span>'; 
+                                break;
+                            case 2: 
+                                echo '<span class="badge bg-warning text-dark ms-1">Admin Structură</span>'; 
+                                break;
+                            case 3: 
+                                echo '<span class="badge bg-primary ms-1">Utilizator</span>'; 
+                                break;
+                            case 4: 
+                                echo '<span class="badge bg-secondary ms-1">Vizitator</span>'; 
+                                break;
+                            default: 
+                                echo '<span class="badge bg-secondary ms-1">Necunoscut</span>';
+                        }
+                    ?>
+                </p>
             </div>
+
             <div class="col-md-6">
-                <p><strong>Structura:</strong> <?php echo htmlspecialchars($person['structura']); ?></p>
-                <p><strong>Substructura:</strong> <?php echo htmlspecialchars($person['substructura'] ? $person['substructura'] : 'N/A'); ?></p>
-                <p><strong>Județ:</strong> <?php echo htmlspecialchars($person['judet'] ? $person['judet'] : 'N/A'); ?></p>
-                <p><strong>UAT / Localitate:</strong> <?php echo htmlspecialchars(($person['uat'] ? $person['uat'] : '') . ($person['localitate'] ? ' / ' . $person['localitate'] : '')); ?></p>
-                <p><strong>Tip Serviciu:</strong> <?php echo htmlspecialchars($person['tip_serviciu'] ? $person['tip_serviciu'] : 'N/A'); ?></p>
+                <h5 class="text-primary border-bottom pb-2 mb-3">Detalii Încadrare</h5>
+                
+                <p class="mb-2"><strong>Structura:</strong> <?php echo htmlspecialchars($person['structura']); ?></p>
+                
+                <p class="mb-2"><strong>Substructura:</strong> <?php echo htmlspecialchars($person['substructura'] ? $person['substructura'] : 'N/A'); ?></p>
+                
+                <p class="mb-2"><strong>Județ:</strong> <?php echo htmlspecialchars($person['judet'] ? $person['judet'] : 'N/A'); ?></p>
+                
+                <p class="mb-2"><strong>UAT / Localitate:</strong> 
+                    <?php echo htmlspecialchars(($person['uat'] ? $person['uat'] : '') . ($person['localitate'] ? ' / ' . $person['localitate'] : '')); ?>
+                </p>
+                
+                <p class="mb-2"><strong>Tip Serviciu:</strong> <?php echo htmlspecialchars($person['tip_serviciu'] ? $person['tip_serviciu'] : 'N/A'); ?></p>
+                
+                <p class="mb-2"><strong>Stare Cont:</strong> 
+                    <?php if($person['activ'] == 1): ?>
+                        <span class="badge bg-success">Activ</span>
+                    <?php else: ?>
+                        <span class="badge bg-secondary">Inactiv</span>
+                    <?php endif; ?>
+                </p>
             </div>
         </div>
     </div>

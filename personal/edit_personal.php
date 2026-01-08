@@ -1,5 +1,5 @@
 <?php
-// edit_personal.php
+// personal/edit_personal.php
 
 $pageTitle = 'Editare Personal';
 require_once '../includes/dashboard_header.php';
@@ -7,18 +7,26 @@ require_once '../includes/dashboard_header.php';
 // Protectie - doar adminii (rol=1) pot accesa aceasta pagina
 if (!isset($userRole) || $userRole != 1) {
     echo '<div class="alert alert-danger">Acces restricționat.</div>';
-    require_once 'includes/dashboard_footer.php';
+    require_once '../includes/dashboard_footer.php';
     exit();
 }
 
+// Preluăm ID-ul (acceptăm și din GET pentru afișare, și din POST hidden dacă e cazul, dar aici ne bazăm pe URL)
 $person_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+// Dacă nu există în GET, verificăm poate a venit pe URL în timpul POST-ului
+if (!$person_id && isset($_GET['id'])) {
+    $person_id = (int)$_GET['id'];
+}
+
 if (!$person_id) {
     echo '<div class="alert alert-danger">ID invalid sau lipsă.</div>';
     require_once '../includes/dashboard_footer.php';
     exit();
 }
 
-$return_url = $_REQUEST['return_url'] ?? 'personal/personal.php'; 
+// Return URL - Dacă suntem în același dosar, doar numele fișierului e suficient
+$return_url = $_REQUEST['return_url'] ?? 'personal.php'; 
 
 $successMessage = '';
 $errorMessage = '';
@@ -32,30 +40,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prenume = trim($_POST['prenume']);
     $email = trim($_POST['email']);
     $telefon = trim($_POST['telefon']);
-    $username = trim($_POST['username']); // Câmp nou
+    $username = trim($_POST['username']); 
     
     // Preluam ID-urile selectate pentru locație
     $judet_id = filter_input(INPUT_POST, 'judet', FILTER_VALIDATE_INT);
     $uat_id = filter_input(INPUT_POST, 'uat', FILTER_VALIDATE_INT);
-    $localitate_nume = trim($_POST['localitate']); // Aici vine numele, nu ID-ul
+    $localitate_nume = trim($_POST['localitate']); 
 
     // Date Serviciu
     $tip_serviciu = $_POST['tip_serviciu'];
     $id_grad = filter_input(INPUT_POST, 'id_grad', FILTER_VALIDATE_INT);
     $id_struct = filter_input(INPUT_POST, 'id_struct', FILTER_VALIDATE_INT);
     $id_substr = filter_input(INPUT_POST, 'id_substr', FILTER_VALIDATE_INT);
-    $clasa = filter_input(INPUT_POST, 'clasa', FILTER_VALIDATE_INT); // Câmp nou
+    $clasa = filter_input(INPUT_POST, 'clasa', FILTER_VALIDATE_INT); 
 
     // Date Cont / Status
-    $activ = filter_input(INPUT_POST, 'activ', FILTER_VALIDATE_INT); // Câmp nou
-    $rol = filter_input(INPUT_POST, 'rol', FILTER_VALIDATE_INT); // Câmp nou
-    $curs_smurd = filter_input(INPUT_POST, 'curs_smurd', FILTER_VALIDATE_INT); // Câmp nou
+    $activ = filter_input(INPUT_POST, 'activ', FILTER_VALIDATE_INT); 
+    $rol = filter_input(INPUT_POST, 'rol', FILTER_VALIDATE_INT); 
+    $curs_smurd = filter_input(INPUT_POST, 'curs_smurd', FILTER_VALIDATE_INT); 
     
     if (empty($nume) || empty($prenume) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errorMessage = 'Numele, prenumele și email-ul sunt obligatorii și trebuie să fie valide.';
     } else {
         try {
-            // --- FIX: Preluam numele corecte din DB folosind ID-urile selectate ---
+            // --- Preluam numele corecte din DB folosind ID-urile selectate ---
             $judet_nume = null;
             $uat_nume = null;
 
@@ -65,8 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($uat_id) {
                 $uat_nume = $pdo->query("SELECT nume_uat FROM uat WHERE id = " . (int)$uat_id)->fetchColumn();
             }
-            // ---------------------------------------------------------------
-                require_once '../includes/dashboard_footer.php';
+            
+            // --- CORECTAT: Am scos require_footer de aici care bloca redirectul ---
+
             // Actualizăm SQL-ul cu noile câmpuri
             $sql = "UPDATE personal SET 
                         nume = ?, prenume = ?, email = ?, telefon = ?, username = ?,
@@ -84,7 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $person_id
             ]);
 
-            $_SESSION['success_message'] = 'Datele au fost actualizate cu succes!';
+            // Redirecționare
+            // Dacă return_url nu conține cale, browserul va căuta în folderul curent (personal/)
             header('Location: ' . $return_url);
             exit();
 
@@ -104,11 +114,11 @@ try {
 
     if (!$person) {
         echo '<div class="alert alert-danger">Persoana nu a fost găsită.</div>';
-        require_once 'includes/dashboard_footer.php';
+        require_once '../includes/dashboard_footer.php';
         exit();
     }
     
-    // --- FIX: Găsim ID-ul județului bazat pe nume_judet ---
+    // --- Găsim ID-ul județului bazat pe nume_judet ---
     $person_judet_id = null;
     if (!empty($person['judet'])) {
         $stmt_jud = $pdo->prepare("SELECT id FROM judete WHERE nume_judet = ?");
@@ -116,14 +126,13 @@ try {
         $person_judet_id = $stmt_jud->fetchColumn();
     }
 
-    // --- FIX: Găsim ID-ul UAT-ului bazat pe nume_uat ---
+    // --- Găsim ID-ul UAT-ului bazat pe nume_uat ---
     $person_uat_id = null;
     if ($person_judet_id && !empty($person['uat'])) {
         $stmt_uat = $pdo->prepare("SELECT id FROM uat WHERE nume_uat = ? AND id_judet = ?");
         $stmt_uat->execute([$person['uat'], $person_judet_id]);
         $person_uat_id = $stmt_uat->fetchColumn();
     }
-    // ----------------------------------------------------
 
     // Preluam listele pentru dropdown-uri statice
     $grade = $pdo->query("SELECT id_grad, nume_grad FROM grade ORDER BY id_grad")->fetchAll();
@@ -151,7 +160,7 @@ try {
     <div class="alert alert-danger"><?php echo htmlspecialchars($errorMessage); ?></div>
 <?php endif; ?>
 
-<form action="personal/edit_personal.php?id=<?php echo $person_id; ?>&return_url=<?php echo htmlspecialchars($return_url); ?>" method="post" class="card content-card mt-4">
+<form action="edit_personal.php?id=<?php echo $person_id; ?>&return_url=<?php echo urlencode($return_url); ?>" method="post" class="card content-card mt-4">
     <div class="card-body">
         
         <h5 class="text-primary mb-3">Informații Personale</h5>
@@ -267,10 +276,10 @@ try {
             <div class="col-md-3 mb-3">
                 <label for="rol" class="form-label">Rol în Aplicație</label>
                 <select class="form-select" id="rol" name="rol">
-                    <option value="4" <?php if($person['rol'] == 4) echo 'selected'; ?>>Utilizator (4)</option>
-                    <option value="3" <?php if($person['rol'] == 3) echo 'selected'; ?>>Editor (3)</option>
-                    <option value="2" <?php if($person['rol'] == 2) echo 'selected'; ?>>Supervizor (2)</option>
-                    <option value="1" <?php if($person['rol'] == 1) echo 'selected'; ?>>Administrator (1)</option>
+                    <option value="4" <?php if($person['rol'] == 4) echo 'selected'; ?>>Vizitator (4)</option>
+                    <option value="3" <?php if($person['rol'] == 3) echo 'selected'; ?>>User (3)</option>
+                    <option value="2" <?php if($person['rol'] == 2) echo 'selected'; ?>>Struct_Admin (2)</option>
+                    <option value="1" <?php if($person['rol'] == 1) echo 'selected'; ?>>Admin (1)</option>
                 </select>
             </div>
             <div class="col-md-3 mb-3">
@@ -293,9 +302,11 @@ try {
     </div>
 </form>
 
+<?php require_once '../includes/dashboard_footer.php'; ?>
+
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log("✅ Script inițializat.");
+    console.log("✅ Script editare inițializat.");
 
     const judetSelect = document.getElementById('judet');
     const uatSelect = document.getElementById('uat');
@@ -327,12 +338,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         selectElement.disabled = false;
     }
 
-    // 2. Fetch Helper
+    // 2. Fetch Helper - CORECTAT PATH CĂTRE API
     async function fetchData(url) {
         try {
-            const r = await fetch(url);
+            // Dacă suntem în personal/edit_personal.php, API-ul e în ../api/
+            const r = await fetch('../' + url);
             return await r.json();
-        } catch(e) { console.error(e); return []; }
+        } catch(e) { console.error("Eroare fetch: " + url, e); return []; }
     }
 
     // Event Listeners
@@ -380,7 +392,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             substructuraSelect.disabled = true;
 
             if (id_struct) {
-                fetch('api/get_substructuri.php?id_struct=' + id_struct)
+                // Fetch corectat cu ../
+                fetch('../api/get_substructuri.php?id_struct=' + id_struct)
                     .then(response => response.json())
                     .then(data => {
                         substructuraSelect.innerHTML = '<option value="0">Fără substructură</option>';
@@ -399,7 +412,3 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 </script>
-
-require_once '../includes/dashboard_footer.php';
-require_once 'includes/dashboard_footer.php';
-?>

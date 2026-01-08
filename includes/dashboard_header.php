@@ -86,7 +86,11 @@ try {
                     <i class="fas fa-file-medical-alt fa-fw"></i> Rapoarte C.R.U.
                 </a>
             </li>
-
+            <li class="nav-item">
+                <a href="<?php echo BASE_URL; ?>osd/registru_osd.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'registru_osd.php') ? 'active' : ''; ?>">
+                    <i class="fas fa-file-medical-alt fa-fw"></i> Registru O.S.D.
+                </a>
+            </li>
             <?php if (isset($userRole) && $userRole == 1): // Afisam doar pentru admini ?>
             <li class="nav-item">
                  <a href="<?php echo BASE_URL; ?>settings.php" class="list-group-item <?php echo (basename($_SERVER['PHP_SELF']) == 'settings.php') ? 'active' : ''; ?>">

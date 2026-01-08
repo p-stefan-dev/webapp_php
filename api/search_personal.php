@@ -25,7 +25,7 @@ try {
     // 2. Interogarea (folosim COALESCE ca să nu avem NULL în text)
     $sql = "SELECT p.id, 
                    CONCAT(
-                       COALESCE(g.nume_grad, ''), ' ', 
+                       COALESCE(g.prescurt, ''), ' ', 
                        p.nume, ' ', 
                        p.prenume, ' - ', 
                        COALESCE(s.prescurt, '')
